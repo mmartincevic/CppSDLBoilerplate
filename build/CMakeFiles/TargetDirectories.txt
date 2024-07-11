@@ -1,0 +1,5 @@
+C:/Users/djomla/Desktop/CppProjects/cppsdlboilerplate/build/CMakeFiles/helpers_lib.dir
+C:/Users/djomla/Desktop/CppProjects/cppsdlboilerplate/build/CMakeFiles/Djomlica.dir
+C:/Users/djomla/Desktop/CppProjects/cppsdlboilerplate/build/CMakeFiles/tests.dir
+C:/Users/djomla/Desktop/CppProjects/cppsdlboilerplate/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/djomla/Desktop/CppProjects/cppsdlboilerplate/build/CMakeFiles/ZERO_CHECK.dir
