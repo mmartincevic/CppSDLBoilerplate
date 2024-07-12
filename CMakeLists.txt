@@ -14,6 +14,12 @@ set(SDL2_INCLUDE_DIRS "${SDL2_DIR}/include")
 set(SDL2_LIBRARY_DIR "${SDL2_DIR}/lib/x64")
 set(SDL2_LIBRARIES "${SDL2_LIBRARY_DIR}/SDL2.lib;${SDL2_LIBRARY_DIR}/SDL2main.lib")
 
+# Define SDL2 Image paths
+set(SDL2_IMG_DIR "${CMAKE_SOURCE_DIR}/vendors/SDL2_image")
+set(SDL2_IMG_INCLUDE_DIRS "${SDL2_IMG_DIR}/include")
+set(SDL2_IMG_LIBRARY_DIR "${SDL2_IMG_DIR}/lib/x64")
+set(SDL2_IMG_LIBRARIES "${SDL2_IMG_LIBRARY_DIR}/SDL2_image.lib")
+
 # Add ImGui
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/vendors/imgui")
 
@@ -32,14 +38,15 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
     
     target_include_directories(${TARGET_NAME} PRIVATE
         ${SDL2_INCLUDE_DIRS}
+        ${SDL2_IMG_INCLUDE_DIRS}
         ${IMGUI_DIR}
         ${CMAKE_SOURCE_DIR}/helpers
     )
     
     if(${TYPE} STREQUAL "EXECUTABLE")
-        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMG_LIBRARIES})
     else()
-        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARY_DIR}/SDL2.lib)
+        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARY_DIR}/SDL2.lib ${SDL2_IMG_LIBRARIES})
     endif()
 endfunction()
 
