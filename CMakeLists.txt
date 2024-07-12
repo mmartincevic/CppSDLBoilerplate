@@ -28,6 +28,7 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
     file(GLOB_RECURSE SOURCE_FILES
         "${SOURCE_DIR}/*.cpp"
         "${SOURCE_DIR}/*.h"
+        "${SOURCE_DIR}/*.hpp"
     )
     
     if(${TYPE} STREQUAL "EXECUTABLE")
@@ -36,11 +37,19 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
         add_library(${TARGET_NAME} ${SOURCE_FILES})
     endif()
     
+    # Create source groups (filters in Visual Studio)
+    foreach(SOURCE_FILE IN ITEMS ${SOURCE_FILES})
+        get_filename_component(SOURCE_PATH "${SOURCE_FILE}" PATH)
+        file(RELATIVE_PATH SOURCE_PATH_REL "${SOURCE_DIR}" "${SOURCE_PATH}")
+        string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH_REL}")
+        source_group("${SOURCE_PATH_MSVC}" FILES "${SOURCE_FILE}")
+    endforeach()
+    
     target_include_directories(${TARGET_NAME} PRIVATE
+        ${SOURCE_DIR}
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMG_INCLUDE_DIRS}
         ${IMGUI_DIR}
-        ${CMAKE_SOURCE_DIR}/helpers
     )
     
     if(${TYPE} STREQUAL "EXECUTABLE")
@@ -56,8 +65,14 @@ add_project_target(helpers_lib ${CMAKE_SOURCE_DIR}/helpers "LIBRARY")
 # Add the main project
 add_project_target(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/project "EXECUTABLE")
 
+# Link the helpers library to the main project
+target_link_libraries(${PROJECT_NAME} PRIVATE helpers_lib)
+
 # Add the test project
 add_project_target(tests ${CMAKE_SOURCE_DIR}/test "EXECUTABLE")
+
+# Link the helpers library to the test project
+target_link_libraries(tests PRIVATE helpers_lib)
 
 # Set the startup project to the main project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
