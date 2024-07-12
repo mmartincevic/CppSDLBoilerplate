@@ -24,7 +24,8 @@ set(SDL2_IMG_LIBRARIES "${SDL2_IMG_LIBRARY_DIR}/SDL2_image.lib")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/vendors/imgui")
 
 # Helper function to add a library or executable
-function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
+function(add_project_target TARGET_NAME SOURCE_DIR TYPE USE_FILTERS)
+    # Find all source files including those in subdirectories
     file(GLOB_RECURSE SOURCE_FILES
         "${SOURCE_DIR}/*.cpp"
         "${SOURCE_DIR}/*.h"
@@ -37,14 +38,20 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
         add_library(${TARGET_NAME} ${SOURCE_FILES})
     endif()
     
-    # Create source groups (filters in Visual Studio)
-    foreach(SOURCE_FILE IN ITEMS ${SOURCE_FILES})
-        get_filename_component(SOURCE_PATH "${SOURCE_FILE}" PATH)
-        file(RELATIVE_PATH SOURCE_PATH_REL "${SOURCE_DIR}" "${SOURCE_PATH}")
-        string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH_REL}")
-        source_group("${SOURCE_PATH_MSVC}" FILES "${SOURCE_FILE}")
-    endforeach()
+    if(${USE_FILTERS})
+        # Create source groups (filters in Visual Studio)
+        foreach(SOURCE_FILE IN ITEMS ${SOURCE_FILES})
+            get_filename_component(SOURCE_PATH "${SOURCE_FILE}" PATH)
+            file(RELATIVE_PATH SOURCE_PATH_REL "${SOURCE_DIR}" "${SOURCE_PATH}")
+            string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH_REL}")
+            source_group("${SOURCE_PATH_MSVC}" FILES "${SOURCE_FILE}")
+        endforeach()
+    else()
+        # Set the VS_SCC_PROJECTNAME property to show folder structure
+        set_property(TARGET ${TARGET_NAME} PROPERTY VS_SCC_PROJECTNAME "${TARGET_NAME}")
+    endif()
     
+    # Include all directories
     target_include_directories(${TARGET_NAME} PRIVATE
         ${SOURCE_DIR}
         ${SDL2_INCLUDE_DIRS}
@@ -59,17 +66,17 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE)
     endif()
 endfunction()
 
-# Add the helpers library
-add_project_target(helpers_lib ${CMAKE_SOURCE_DIR}/helpers "LIBRARY")
+# Add the helpers library (with filters)
+add_project_target(helpers_lib ${CMAKE_SOURCE_DIR}/helpers "LIBRARY" TRUE)
 
-# Add the main project
-add_project_target(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/project "EXECUTABLE")
+# Add the main project (without filters)
+add_project_target(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/project "EXECUTABLE" FALSE)
 
 # Link the helpers library to the main project
 target_link_libraries(${PROJECT_NAME} PRIVATE helpers_lib)
 
-# Add the test project
-add_project_target(tests ${CMAKE_SOURCE_DIR}/test "EXECUTABLE")
+# Add the test project (without filters)
+add_project_target(tests ${CMAKE_SOURCE_DIR}/test "EXECUTABLE" FALSE)
 
 # Link the helpers library to the test project
 target_link_libraries(tests PRIVATE helpers_lib)
