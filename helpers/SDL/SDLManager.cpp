@@ -37,6 +37,19 @@ bool SDLManager::Init(const std::string& title, int width, int height)
         return false;
     }
 
+    if (TTF_Init() == -1)
+    {
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        // Handle error...
+    }
+
+    m_font = TTF_OpenFont("../vendors/sfprobold.ttf", 16);
+    if (m_font == nullptr)
+    {
+        std::cout << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
+        return 1;
+    }
+
     SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     return true;
@@ -57,7 +70,14 @@ void SDLManager::Cleanup()
         m_window = nullptr;
     }
 
+    if (m_font)
+    {
+        TTF_CloseFont(m_font);
+        m_font = nullptr;
+    }
+
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -115,4 +135,23 @@ bool SDLManager::HandleEvents()
         }
     }
     return !m_quit;
+}
+
+SDL_Texture* SDLManager::renderText(const std::string& text, SDL_Color color)
+{
+    SDL_Surface* surface = TTF_RenderText_Solid(m_font, text.c_str(), color);
+    if (surface == nullptr)
+    {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+        return nullptr;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, surface);
+    if (texture == nullptr)
+    {
+        printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+    }
+
+    SDL_FreeSurface(surface);
+    return texture;
 }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(Djomlica)
+project(CppSDLBoilerplate)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -19,6 +19,12 @@ set(SDL2_IMG_DIR "${CMAKE_SOURCE_DIR}/vendors/SDL2_image")
 set(SDL2_IMG_INCLUDE_DIRS "${SDL2_IMG_DIR}/include")
 set(SDL2_IMG_LIBRARY_DIR "${SDL2_IMG_DIR}/lib/x64")
 set(SDL2_IMG_LIBRARIES "${SDL2_IMG_LIBRARY_DIR}/SDL2_image.lib")
+
+# Define SDL2 TTF paths
+set(SDL2_TTF_DIR "${CMAKE_SOURCE_DIR}/vendors/SDL2_ttf")
+set(SDL2_TTF_INCLUDE_DIRS "${SDL2_TTF_DIR}/include")
+set(SDL2_TTF_LIBRARY_DIR "${SDL2_TTF_DIR}/lib/x64")
+set(SDL2_TTF_LIBRARIES "${SDL2_TTF_LIBRARY_DIR}/SDL2_ttf.lib")
 
 # Add ImGui
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/vendors/imgui")
@@ -56,13 +62,14 @@ function(add_project_target TARGET_NAME SOURCE_DIR TYPE USE_FILTERS)
         ${SOURCE_DIR}
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMG_INCLUDE_DIRS}
+        ${SDL2_TTF_INCLUDE_DIRS}
         ${IMGUI_DIR}
     )
     
     if(${TYPE} STREQUAL "EXECUTABLE")
-        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMG_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMG_LIBRARIES} ${SDL2_TTF_LIBRARIES})
     else()
-        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARY_DIR}/SDL2.lib ${SDL2_IMG_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} PRIVATE ${SDL2_LIBRARY_DIR}/SDL2.lib ${SDL2_IMG_LIBRARIES} ${SDL2_TTF_LIBRARIES})
     endif()
 endfunction()
 
